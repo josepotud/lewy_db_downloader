@@ -87,7 +87,7 @@ const Exporter = {
     const dateStr = new Date().toISOString().split('T')[0];
     const modeSuffix = isLabels ? 'Etiquetas' : 'Valores';
     XLSX.writeFile(wb, `BaseDeDatosLewy_MultiHoja_${modeSuffix}_${dateStr}.xlsx`);
-    App.showToast(`✅ Excel (${modeSuffix}) descargado con éxito`, 'success');
+    App.showToast(`Excel (${modeSuffix}) descargado con éxito`, 'success');
   },
 
   // 2. Exportar Tabla de Fusión Temporal (Multi-Hoja)
@@ -162,7 +162,7 @@ const Exporter = {
       });
 
       XLSX.writeFile(wb, `${fileName}.xlsx`);
-      App.showToast(`✅ Libro Excel descargado con ${result.selectedForms.length + 1} hojas`, 'success');
+      App.showToast(`Libro Excel descargado con ${result.selectedForms.length + 1} hojas`, 'success');
 
     } else if (typeof Papa !== 'undefined') {
       const flatMasterRows = result.rows.map(r => TimeMatcher.flattenPatientRow(r, result.selectedForms, true, exportMode));
@@ -172,7 +172,7 @@ const Exporter = {
       link.href = URL.createObjectURL(blob);
       link.download = `${fileName}.csv`;
       link.click();
-      App.showToast(`✅ Fusión temporal descargada en CSV`, 'success');
+      App.showToast(`Fusión temporal descargada en CSV`, 'success');
     }
   },
 
@@ -197,7 +197,7 @@ const Exporter = {
     link.download = `CohorteLewy_Import_REDCap_Valores_${dateStr}.csv`;
     link.click();
 
-    App.showToast('✅ CSV REDCap descargado', 'success');
+    App.showToast('CSV REDCap descargado', 'success');
   },
 
   // 4. Exportar Backup JSON
@@ -208,6 +208,6 @@ const Exporter = {
     link.href = dataStr;
     link.download = `CohorteLewy_Backup_${dateStr}.json`;
     link.click();
-    App.showToast('✅ Backup JSON descargado', 'success');
+    App.showToast('Backup JSON descargado', 'success');
   }
 };

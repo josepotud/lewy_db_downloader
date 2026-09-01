@@ -9,21 +9,18 @@ const TimeMatcher = {
     // 1. INSTRUMENTOS BASALES INDEPENDIENTES (Sin medidas repetidas / Sin fecha)
     'demograficos': {
       title: 'Demográficos',
-      icon: '👤',
       isIndependent: true,
       isRepeating: false,
       color: '#64748b'
     },
     'antecedentes': {
       title: 'Antecedentes',
-      icon: '🏥',
       isIndependent: true,
       isRepeating: false,
       color: '#475569'
     },
     'genetica_molecular': {
       title: 'Genética Molecular',
-      icon: '🧬',
       isIndependent: true,
       isRepeating: false,
       color: '#334155'
@@ -32,7 +29,6 @@ const TimeMatcher = {
     // 2. INSTRUMENTOS TEMPORALES (Con fechas y medidas longitudinales)
     'visita_estudio': {
       title: 'Visita de Estudio',
-      icon: '🩺',
       dateVars: ['hx_fecha_visita'],
       isIndependent: false,
       isRepeating: false,
@@ -40,7 +36,6 @@ const TimeMatcher = {
     },
     'evaluacion_neuropsicologica': {
       title: 'Neuropsicología',
-      icon: '🧠',
       dateVars: ['npi_fecha'],
       isIndependent: false,
       isRepeating: false,
@@ -48,7 +43,6 @@ const TimeMatcher = {
     },
     'mds_updrs_examination': {
       title: 'MDS-UPDRS',
-      icon: '🚶',
       dateVars: ['updrs_fecha'],
       isIndependent: false,
       isRepeating: false,
@@ -56,7 +50,6 @@ const TimeMatcher = {
     },
     'inventario_neuropsiquiatrico_npi': {
       title: 'NPI Cummings',
-      icon: '💭',
       dateVars: ['npi_fecha'],
       isIndependent: false,
       isRepeating: false,
@@ -64,7 +57,6 @@ const TimeMatcher = {
     },
     'escalas_funcionales_y_globales': {
       title: 'Escalas Funcionales',
-      icon: '📊',
       dateVars: ['faq_fecha', 'cdr_fecha'],
       isIndependent: false,
       isRepeating: false,
@@ -72,7 +64,6 @@ const TimeMatcher = {
     },
     'diagnostico_y_gds': {
       title: 'Diagnóstico y GDS',
-      icon: '🎯',
       dateVars: ['fecha_dx_gds'],
       isIndependent: false,
       isRepeating: true,
@@ -80,7 +71,6 @@ const TimeMatcher = {
     },
     'puncion_lumbar': {
       title: 'Punción Lumbar',
-      icon: '🧪',
       dateVars: ['pl_fecha'],
       isIndependent: false,
       isRepeating: true,
@@ -88,7 +78,6 @@ const TimeMatcher = {
     },
     'resonancia_magnetica': {
       title: 'Resonancia Magnética',
-      icon: '🧲',
       dateVars: ['rm_fecha', 'fecha_rm'],
       isIndependent: false,
       isRepeating: true,
@@ -96,7 +85,6 @@ const TimeMatcher = {
     },
     'datscan_spect': {
       title: 'DaTSCAN SPECT',
-      icon: '⚡',
       dateVars: ['datscan_fecha'],
       isIndependent: false,
       isRepeating: false,
@@ -104,7 +92,6 @@ const TimeMatcher = {
     },
     'pet_amiloide': {
       title: 'PET Amiloide',
-      icon: '🔬',
       dateVars: ['petami_fecha'],
       isIndependent: false,
       isRepeating: false,
@@ -112,7 +99,6 @@ const TimeMatcher = {
     },
     'pet_fdg': {
       title: 'PET-FDG',
-      icon: '☢️',
       dateVars: ['petfdg_fecha_visual', 'fecha_petfdg'],
       isIndependent: false,
       isRepeating: true,
@@ -120,7 +106,6 @@ const TimeMatcher = {
     },
     'electroencefalograma': {
       title: 'Electroencefalograma',
-      icon: '📈',
       dateVars: ['eeg_clinico_fecha', 'eeg_fecha'],
       isIndependent: false,
       isRepeating: false,

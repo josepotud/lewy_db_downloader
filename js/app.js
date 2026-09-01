@@ -48,19 +48,19 @@ const App = {
     let html = '';
 
     // Grupo 1: Instrumentos Basales Independientes
-    html += `<div style="font-size:11px; font-weight:700; color:#0369a1; text-transform:uppercase; margin-bottom:4px; border-bottom:1px solid #e0f2fe; padding-bottom:2px;">📌 Datos Basales (Sin medidas repetidas)</div>`;
+    html += `<div style="font-size:11px; font-weight:700; color:#0369a1; text-transform:uppercase; margin-bottom:4px; border-bottom:1px solid #e0f2fe; padding-bottom:2px;">Datos Basales (Sin medidas repetidas)</div>`;
     const independentKeys = ['demograficos', 'antecedentes', 'genetica_molecular'];
     independentKeys.forEach(formKey => {
       const cfg = TimeMatcher.instrumentConfig[formKey];
       if (!cfg) return;
       html += `<label class="check-item" style="background:#f0f9ff; border-color:#bae6fd;">
         <input type="checkbox" name="matcher_form" value="${formKey}" checked onchange="App.runTimeMatcher()" />
-        <span>${cfg.icon || '📌'} ${cfg.title}</span>
+        <span>${cfg.title}</span>
       </label>`;
     });
 
     // Grupo 2: Pruebas y Evaluaciones Temporales
-    html += `<div style="font-size:11px; font-weight:700; color:#0f766e; text-transform:uppercase; margin:10px 0 4px 0; border-bottom:1px solid #ccfbf1; padding-bottom:2px;">⏱️ Pruebas y Biomarcadores (Temporales)</div>`;
+    html += `<div style="font-size:11px; font-weight:700; color:#0f766e; text-transform:uppercase; margin:10px 0 4px 0; border-bottom:1px solid #ccfbf1; padding-bottom:2px;">Pruebas y Biomarcadores (Temporales)</div>`;
     const temporalKeys = ['visita_estudio', 'puncion_lumbar', 'pet_fdg', 'resonancia_magnetica', 'evaluacion_neuropsicologica', 'mds_updrs_examination', 'inventario_neuropsiquiatrico_npi', 'escalas_funcionales_y_globales', 'diagnostico_y_gds', 'datscan_spect', 'pet_amiloide', 'electroencefalograma'];
     const defaultChecked = ['visita_estudio', 'puncion_lumbar', 'pet_fdg', 'resonancia_magnetica', 'evaluacion_neuropsicologica', 'datscan_spect'];
 
@@ -70,7 +70,7 @@ const App = {
       const checked = defaultChecked.includes(formKey) ? 'checked' : '';
       html += `<label class="check-item">
         <input type="checkbox" name="matcher_form" value="${formKey}" ${checked} onchange="App.runTimeMatcher()" />
-        <span>${cfg.icon || '⏱️'} ${cfg.title}</span>
+        <span>${cfg.title}</span>
       </label>`;
     });
 
@@ -142,7 +142,7 @@ const App = {
     if (!thead || !tbody) return;
 
     const anchorCfg = TimeMatcher.instrumentConfig[options.anchorForm];
-    let headHTML = `<tr><th>ID Paciente</th><th>Género / Nac.</th><th>Diagnóstico</th><th>📍 ${anchorCfg ? anchorCfg.title : 'Referencia'} (Fecha)</th>`;
+    let headHTML = `<tr><th>ID Paciente</th><th>Género / Nac.</th><th>Diagnóstico</th><th>${anchorCfg ? anchorCfg.title : 'Referencia'} (Fecha)</th>`;
     options.selectedForms.forEach(f => {
       if (f !== options.anchorForm) {
         const cfg = TimeMatcher.instrumentConfig[f];
@@ -259,7 +259,7 @@ const App = {
           if (results.data && results.data.length > 0) {
             AppState.loadData(results.data, 'file');
             App.closeModal('modal-import');
-            App.showToast(`✅ Base cargada: ${results.data.length} filas`, 'success');
+            App.showToast(`Base cargada: ${results.data.length} filas`, 'success');
             DashboardManager.render();
             TableView.render();
             App.runTimeMatcher();
@@ -280,7 +280,7 @@ const App = {
         if (rows && rows.length > 0) {
           AppState.loadData(rows, 'file');
           App.closeModal('modal-import');
-          App.showToast(`✅ Excel cargado: ${rows.length} filas`, 'success');
+          App.showToast(`Excel cargado: ${rows.length} filas`, 'success');
           DashboardManager.render();
           TableView.render();
           App.runTimeMatcher();
@@ -296,7 +296,7 @@ const App = {
           if (Array.isArray(rows)) {
             AppState.loadData(rows, 'file');
             App.closeModal('modal-import');
-            App.showToast(`✅ JSON cargado: ${rows.length} filas`, 'success');
+            App.showToast(`JSON cargado: ${rows.length} filas`, 'success');
             DashboardManager.render();
             TableView.render();
             App.runTimeMatcher();

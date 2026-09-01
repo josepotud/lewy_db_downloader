@@ -65,12 +65,9 @@ const ApiClient = {
       statusBox.style.background = '#f0fdf4';
       statusBox.style.borderColor = '#86efac';
       statusBox.innerHTML = `
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span style="font-size:20px;">⏳</span>
-          <div>
-            <strong>Conectando con el servidor REDCap...</strong>
-            <p style="font-size:12px; color:#475569; margin:0;">Descargando registros de la cohorte en vivo</p>
-          </div>
+        <div>
+          <strong>Conectando con el servidor REDCap...</strong>
+          <p style="font-size:12px; color:#475569; margin:0;">Descargando registros de la cohorte en vivo</p>
         </div>
       `;
     }
@@ -112,7 +109,7 @@ const ApiClient = {
         statusBox.style.borderColor = '#34d399';
         statusBox.innerHTML = `
           <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:20px;">✅</span>
+            
             <div>
               <strong style="color:#065f46;">¡Conexión Exitosa con REDCap!</strong>
               <p style="font-size:12px; color:#065f46; margin:0;">Sincronizados ${records.length} registros en vivo. Credenciales guardadas.</p>
@@ -121,7 +118,7 @@ const ApiClient = {
         `;
       }
 
-      App.showToast(`✅ Sincronizados ${records.length} registros desde REDCap`, 'success');
+      App.showToast(`Sincronizados ${records.length} registros desde REDCap`, 'success');
       DashboardManager.render();
       TableView.render();
       App.runTimeMatcher();
@@ -138,16 +135,16 @@ const ApiClient = {
         statusBox.style.borderColor = '#fca5a5';
         statusBox.innerHTML = `
           <div style="margin-bottom:8px;">
-            <strong style="color:#991b1b;">⚠️ No se pudo conectar directamente con la API</strong>
+            <strong style="color:#991b1b;">No se pudo conectar directamente con la API</strong>
             <p style="font-size:12px; color:#7f1d1d; margin:4px 0 0 0;">
               El navegador bloqueó la conexión directa por política CORS del servidor REDCap o token incorrecto.
             </p>
           </div>
           <div style="background:#ffffff; border:1px solid #fecaca; border-radius:6px; padding:10px; margin-top:8px;">
-            <p style="font-size:12px; color:#1e293b; font-weight:600; margin-bottom:6px;">💡 Solución inmediata:</p>
+            <p style="font-size:12px; color:#1e293b; font-weight:600; margin-bottom:6px;">Solución inmediata:</p>
             <p style="font-size:12px; color:#475569; margin-bottom:8px;">Carga el archivo CSV o Excel exportado desde REDCap:</p>
             <button class="btn btn-sm btn-primary" onclick="App.closeModal('modal-api'); App.openModal('modal-import');">
-              📁 Cargar Archivo CSV / Excel (.xlsx)
+              Cargar Archivo CSV / Excel (.xlsx)
             </button>
           </div>
         `;

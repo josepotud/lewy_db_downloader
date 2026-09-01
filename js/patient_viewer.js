@@ -116,7 +116,7 @@ const PatientViewer = {
         }
         currentSection = v.header;
         html += `<div class="form-section-card">
-          <div class="form-section-header">📌 ${currentSection}</div>
+          <div class="form-section-header">${currentSection}</div>
           <div class="form-grid">`;
         inSectionCard = true;
       } else if (!inSectionCard) {
@@ -170,21 +170,21 @@ const PatientViewer = {
       const bmi = ClinicalCalculations.calculateBMI(row.hx_peso, row.hx_altura);
       if (bmi) {
         return `<div class="card" style="background:#f0fdf4; border-color:#86efac; padding:12px 16px; margin-bottom:16px;">
-          <strong>🧮 Autocálculo Clínico:</strong> IMC = <span class="calc-badge">${bmi.value} kg/m²</span> (${bmi.category})
+          <strong>Autocálculo Clínico:</strong> IMC = <span class="calc-badge">${bmi.value} kg/m²</span> (${bmi.category})
         </div>`;
       }
     } else if (formId === 'puncion_lumbar') {
       const ratio = ClinicalCalculations.calculatePtauAb42Ratio(row.pl_ptau_valor, row.pl_ab42_valor);
       if (ratio) {
         return `<div class="card" style="background:#f0fdf4; border-color:#86efac; padding:12px 16px; margin-bottom:16px;">
-          <strong>🧮 Autocálculo LCR:</strong> Cociente p-tau181/Aβ42 = <span class="calc-badge">${ratio.value}</span> (${ratio.status})
+          <strong>Autocálculo LCR:</strong> Cociente p-tau181/Aβ42 = <span class="calc-badge">${ratio.value}</span> (${ratio.status})
         </div>`;
       }
     } else if (formId === 'escalas_funcionales_y_globales') {
       const cdrSob = ClinicalCalculations.calculateCDRSOB(row);
       if (cdrSob) {
         return `<div class="card" style="background:#f0fdf4; border-color:#86efac; padding:12px 16px; margin-bottom:16px;">
-          <strong>🧮 Autocálculo CDR:</strong> CDR Sum of Boxes (CDR-SOB) = <span class="calc-badge">${cdrSob.value}</span>
+          <strong>Autocálculo CDR:</strong> CDR Sum of Boxes (CDR-SOB) = <span class="calc-badge">${cdrSob.value}</span>
         </div>`;
       }
     }

@@ -207,8 +207,8 @@ const TableView = {
         });
 
         bodyHTML += `<td style="text-align:right;">
-          <button class="btn btn-sm btn-outline-primary" onclick="PatientViewer.open('${id}')" title="Ver Ficha">👁️ Ficha</button>
-          <button class="btn btn-sm btn-secondary" onclick="ReportPrinter.open('${id}')" title="Informe PDF">🖨️ Informe</button>
+          <button class="btn btn-sm btn-outline-primary" onclick="PatientViewer.open('${id}')" title="Ver Ficha">Ficha</button>
+          <button class="btn btn-sm btn-secondary" onclick="ReportPrinter.open('${id}')" title="Informe PDF">Informe</button>
         </td>`;
         bodyHTML += `</tr>`;
       });

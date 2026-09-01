@@ -143,7 +143,7 @@ const DeepSearch = {
       if (actionsEl) actionsEl.style.display = 'none';
       container.innerHTML = `
         <div style="text-align:center; padding:40px 20px; color:var(--text-muted);">
-          <div style="font-size:36px; margin-bottom:10px;">🔍</div>
+          
           <h3 style="font-size:15px; color:var(--text-main); margin-bottom:4px;">Buscador Rápido de Texto y Hallazgos</h3>
           <p style="font-size:13px; max-width:600px; margin:0 auto;">
             Escribe cualquier término (ej. <em>"temblor"</em>, <em>"donepezilo"</em>, <em>"alucinaciones"</em>, <em>"GBA"</em>, <em>"302.1"</em>). El sistema rastrea instantáneamente todas las variables y te muestra su ubicación exacta.
@@ -167,7 +167,7 @@ const DeepSearch = {
     if (totalPatients === 0) {
       container.innerHTML = `
         <div style="text-align:center; padding:35px; color:var(--text-muted);">
-          <div style="font-size:28px; margin-bottom:6px;">😕</div>
+          
           <h3 style="font-size:15px; color:var(--text-main);">No se encontraron coincidencias para "${this.lastQuery}"</h3>
           <p style="font-size:12px; margin-top:2px;">Prueba con otra palabra clave o término más general.</p>
         </div>
@@ -191,7 +191,7 @@ const DeepSearch = {
             </div>
             <div style="display:flex; align-items:center; gap:6px;">
               <span class="badge badge-teal">${p.matchesCount} coincidencia${p.matchesCount > 1 ? 's' : ''}</span>
-              <button class="btn btn-sm btn-outline-primary" onclick="PatientViewer.open('${p.patientId}')">👁️ Ficha</button>
+              <button class="btn btn-sm btn-outline-primary" onclick="PatientViewer.open('${p.patientId}')">Ficha</button>
             </div>
           </div>
 
@@ -206,7 +206,7 @@ const DeepSearch = {
         html += `
           <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:4px; padding:8px 10px; font-size:12px;">
             <div style="display:flex; justify-content:space-between; margin-bottom:2px; font-size:11px; color:#64748b;">
-              <span><strong>📍 ${m.formTitle}</strong> ${instBadge} &gt; <code>${m.variable}</code></span>
+              <span><strong>${m.formTitle}</strong> ${instBadge} &gt; <code>${m.variable}</code></span>
             </div>
             <div style="color:#334155; margin-bottom:2px;">
               ${highlightedLabel}
@@ -225,7 +225,7 @@ const DeepSearch = {
       html += `
         <div style="text-align:center; padding:12px; margin-top:8px;">
           <button class="btn btn-secondary" onclick="DeepSearch.loadMore()">
-            🔽 Mostrar más pacientes (${totalPatients - this.displayLimit} restantes)
+            Mostrar más pacientes (${totalPatients - this.displayLimit} restantes)
           </button>
         </div>
       `;
@@ -287,7 +287,7 @@ const DeepSearch = {
       const ws = XLSX.utils.json_to_sheet(flatRows);
       XLSX.utils.book_append_sheet(wb, ws, 'Resultados_Busqueda');
       XLSX.writeFile(wb, `${fileName}.xlsx`);
-      App.showToast('✅ Resultados de búsqueda exportados a Excel', 'success');
+      App.showToast('Resultados de búsqueda exportados a Excel', 'success');
     } else if (typeof Papa !== 'undefined') {
       const csv = Papa.unparse(flatRows, { quotes: true, header: true });
       const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
@@ -295,7 +295,7 @@ const DeepSearch = {
       link.href = URL.createObjectURL(blob);
       link.download = `${fileName}.csv`;
       link.click();
-      App.showToast('✅ Resultados de búsqueda exportados a CSV', 'success');
+      App.showToast('Resultados de búsqueda exportados a CSV', 'success');
     }
   }
 };

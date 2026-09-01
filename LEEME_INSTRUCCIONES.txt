@@ -1,0 +1,30 @@
+==============================================================================
+   LEWY DATA SUITE - MANUAL DE INSTRUCCIONES Y GUÍA RÁPIDA (ZERO-INSTALL)
+==============================================================================
+
+Visor Clínico, Sincronizador de API REDCap, Fusión Temporal y Exportación.
+
+1. CÓMO ABRIR LA APLICACIÓN
+------------------------------------------------------------------------------
+- Haz doble clic en el archivo "Abrir_App.bat" (en la raíz del proyecto o en "app/").
+  La aplicación se abrirá en tu navegador web predeterminado sin instalaciones.
+
+2. CONEXIÓN API REDCap Y CARGA DE ARCHIVOS
+------------------------------------------------------------------------------
+- DESCARGA EN VIVO VÍA API:
+  Pulsa el botón "Conectar API REDCap", introduce la URL de la API y tu Token
+  para descargar y sincronizar los registros en tiempo real.
+
+- CARGA LOCAL DE ARCHIVOS (FALLBACK):
+  Si no tienes token o estás sin conexión, pulsa "Cargar Archivo Local" o
+  arrastra cualquier archivo CSV (.csv) o Excel (.xlsx) exportado de REDCap.
+
+3. FUNCIONALIDADES
+------------------------------------------------------------------------------
+- PANEL DE CONTROL: Resumen de pacientes y biomarcadores disponibles.
+- EXPLORADOR DE PACIENTES: Buscador en tiempo real con 8 vistas temáticas.
+- FUSIÓN TEMPORAL (±6 MESES): Unifica pruebas cercanas en el tiempo
+  (LCR, PET, RM, EEG, Neuropsicología) calculando los días de diferencia (Δdías).
+- FICHA DEL PACIENTE: Consulta estructurada y limpia de los 15 instrumentos.
+- CENTRO DE EXPORTACIÓN: Descarga en Excel Multi-Hoja (.xlsx), CSV y PDF.
+==============================================================================
