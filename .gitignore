@@ -1,0 +1,19 @@
+# Data Privacy Safeguards (Never commit personal patient data)
+*.csv
+*.xlsx
+*.xls
+*.json
+*.zip
+*.tar.gz
+*.log
+
+# Allow necessary project files
+!data/default_data.js
+!data/dictionary_data.js
+
+# OS & Temp
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+.env

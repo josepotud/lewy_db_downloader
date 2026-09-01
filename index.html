@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lewy Data Suite - Cohorte Lewy Madrid</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+  <!-- Cabecera Superior -->
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="brand-icon">🧠</div>
+      <div class="brand-title">
+        <h1>Cohorte Lewy Madrid</h1>
+        <p>Plataforma Multimodal de Investigación Clínica</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary" onclick="App.openModal('modal-api')">🔗 Conectar API REDCap</button>
+      <button class="btn btn-secondary" onclick="App.openModal('modal-import')">📥 Cargar Archivo Local</button>
+      <button class="btn btn-success" onclick="Exporter.exportExcelMultiSheet()">💾 Descargar Excel</button>
+      <button class="btn btn-outline-primary" onclick="App.openModal('modal-help')">❓ Ayuda</button>
+    </div>
+  </header>
+
+  <!-- Pestañas de Navegación -->
+  <nav class="nav-bar">
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="tab-dashboard" onclick="App.switchTab('tab-dashboard')">
+        📊 Panel de Control
+      </button>
+      <button class="nav-tab" data-tab="tab-table" onclick="App.switchTab('tab-table')">
+        📋 Explorador
+      </button>
+      <button class="nav-tab" data-tab="tab-search" onclick="App.switchTab('tab-search')">
+        🔍 Búsqueda Libre
+      </button>
+      <button class="nav-tab" data-tab="tab-matcher" onclick="App.switchTab('tab-matcher')">
+        ⏱️ Fusión Temporal
+      </button>
+      <button class="nav-tab" data-tab="tab-viewer" onclick="App.switchTab('tab-viewer')">
+        👁️ Ficha del Paciente
+      </button>
+      <button class="nav-tab" data-tab="tab-export" onclick="App.switchTab('tab-export')">
+        📤 Exportación
+      </button>
+    </div>
+  </nav>
+
+  <!-- Contenedor Principal -->
+  <main class="main-content">
+
+    <!-- 1. TAB: DASHBOARD -->
+    <section id="tab-dashboard" class="tab-pane active">
+
+      <!-- Banner inicial si no hay datos cargados -->
+      <div id="dashboard-empty-banner" class="card" style="text-align:center; padding:50px 20px; background:#f8fafc; border:2px dashed #cbd5e1; display:none;">
+        <div style="font-size:40px; margin-bottom:12px;">📂</div>
+        <h2 style="font-size:18px; color:#1e293b; margin-bottom:6px;">No hay datos cargados en memoria</h2>
+        <p style="font-size:13px; color:#64748b; max-width:550px; margin:0 auto 20px auto;">
+          Conecta directamente con la API de REDCap para descargar los datos actualizados de la cohorte o abre un archivo CSV / Excel exportado desde REDCap.
+        </p>
+        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+          <button class="btn btn-lg btn-primary" onclick="App.openModal('modal-api')">🔗 Conectar API REDCap</button>
+          <button class="btn btn-lg btn-secondary" onclick="App.openModal('modal-import')">📥 Cargar Archivo CSV / Excel</button>
+        </div>
+      </div>
+
+      <!-- Panel de Contenido Descriptivo cuando hay datos -->
+      <div id="dashboard-content">
+        <!-- Fichas Descriptivas de la Cohorte -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:16px; margin-bottom:16px;">
+          <!-- Panel Demográfico -->
+          <div class="card" style="padding:16px 20px;">
+            <h2 class="card-title" style="margin-bottom:12px; color:#0369a1;">👥 Resumen Demográfico y Clínico</h2>
+            <div id="dashboard-demo-table"></div>
+          </div>
+
+          <!-- Panel de Pruebas y Biomarcadores -->
+          <div class="card" style="padding:16px 20px;">
+            <h2 class="card-title" style="margin-bottom:12px; color:#0f766e;">🧪 Disponibilidad de Pruebas y Biomarcadores</h2>
+            <div id="dashboard-tests-table"></div>
+          </div>
+        </div>
+
+        <!-- Gráficos Descriptivos -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h2 class="card-title" style="margin-bottom:12px;">🎯 Distribución Diagnóstica</h2>
+            <div class="chart-container">
+              <canvas id="chart-diagnosis"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h2 class="card-title" style="margin-bottom:12px;">📊 Cobertura de Pruebas</h2>
+            <div class="chart-container">
+              <canvas id="chart-biomarkers"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. TAB: TABLE EXPLORER -->
+    <section id="tab-table" class="tab-pane">
+      <div class="card">
+        <div class="table-toolbar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="global-search" placeholder="Buscar por ID Lewy, diagnóstico, notas clínicas o síntomas..." oninput="TableView.onSearchInput(this.value)" />
+          </div>
+          <div class="filter-group">
+            <label style="font-size:12px; font-weight:600;">Vista:</label>
+            <select class="select-control" onchange="TableView.setPreset(this.value)">
+              <option value="general">1. General</option>
+              <option value="clinica">2. Clínica y Debut</option>
+              <option value="neuropsicologia">3. Neuropsicología</option>
+              <option value="updrs_npi">4. MDS-UPDRS y NPI</option>
+              <option value="escalas">5. Escalas Funcionales</option>
+              <option value="lcr">6. Punción Lumbar (LCR)</option>
+              <option value="neuroimagen">7. Neuroimagen y SPECT</option>
+              <option value="eeg">8. Electroencefalograma</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead id="table-header"></thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination-bar">
+          <div id="pagination-info" class="pagination-info">Mostrando 0 de 0</div>
+          <div class="pagination-controls">
+            <button id="btn-prev-page" class="btn btn-sm btn-secondary" onclick="TableView.prevPage()">◀ Anterior</button>
+            <button id="btn-next-page" class="btn btn-sm btn-secondary" onclick="TableView.nextPage()">Siguiente ▶</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. TAB: DEEP TEXT SEARCH -->
+    <section id="tab-search" class="tab-pane">
+      <div class="card" style="background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); border-color: #bae6fd; margin-bottom:16px;">
+        <h2 class="card-title" style="color:#0369a1;">🔍 Búsqueda Libre</h2>
+        <p style="font-size:13px; color:#475569; margin: 4px 0 12px 0;">
+          Rastrea cualquier término en valores, etiquetas y notas clínicas de todos los instrumentos.
+        </p>
+        
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <div class="search-box" style="flex:1; min-width:300px;">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="deep-search-input" placeholder="Escribe un término (ej. temblor, donepezilo, alucinaciones, GBA, abeta, mta)..." oninput="DeepSearch.onInput(this.value)" onkeydown="if(event.key==='Enter') DeepSearch.search(this.value)" />
+            <span id="search-loading-indicator" class="badge badge-warning" style="display:none; position:absolute; right:10px; top:50%; transform:translateY(-50%); font-size:11px;">Buscando...</span>
+          </div>
+          <button class="btn btn-secondary" onclick="document.getElementById('deep-search-input').value=''; DeepSearch.search('');">Limpiar</button>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+        <div id="search-results-count" style="font-size:13px; font-weight:600; color:#1e293b;"></div>
+        <div id="search-export-actions" style="display:none; gap:8px;">
+          <button class="btn btn-sm btn-primary" onclick="DeepSearch.filterTableWithResults()">📋 Ver en Explorador</button>
+          <button class="btn btn-sm btn-success" onclick="DeepSearch.exportSearchResults('xlsx')">📥 Descargar Excel</button>
+          <button class="btn btn-sm btn-secondary" onclick="DeepSearch.exportSearchResults('csv')">Exportar CSV</button>
+        </div>
+      </div>
+
+      <div id="search-results-container"></div>
+    </section>
+
+    <!-- 4. TAB: TIME-WINDOW MATCHER -->
+    <section id="tab-matcher" class="tab-pane">
+      <div class="matcher-hero">
+        <h2>⏱️ Fusión Temporal</h2>
+        <p>Unifica evaluaciones de diferentes modalidades realizadas en periodos cercanos.</p>
+      </div>
+
+      <div class="matcher-config-card">
+        <h2 class="card-title" style="color:#065f46;">⚙️ Configuración</h2>
+        
+        <div class="matcher-grid">
+          <!-- Col 1: Instrumento Ancla -->
+          <div class="matcher-box">
+            <div class="matcher-box-title">📍 1. Instrumento de Referencia</div>
+            <select id="matcher-anchor-select" class="select-control" style="width:100%; margin-top:6px;" onchange="App.runTimeMatcher()">
+              <option value="puncion_lumbar">Punción Lumbar</option>
+              <option value="pet_fdg">PET-FDG</option>
+              <option value="resonancia_magnetica">Resonancia Magnética</option>
+              <option value="visita_estudio">Visita de Estudio</option>
+              <option value="evaluacion_neuropsicologica">Neuropsicología</option>
+              <option value="datscan_spect">DaTSCAN SPECT</option>
+            </select>
+          </div>
+
+          <!-- Col 2: Ventana Temporal y Selección -->
+          <div class="matcher-box">
+            <div class="matcher-box-title">⏳ 2. Ventana Temporal</div>
+            <div class="tolerance-buttons">
+              <button class="tolerance-btn" data-days="90" onclick="App.setTolerance(90)">±3 Meses</button>
+              <button class="tolerance-btn active" data-days="180" onclick="App.setTolerance(180)">±6 Meses</button>
+              <button class="tolerance-btn" data-days="365" onclick="App.setTolerance(365)">±1 Año</button>
+              <button class="tolerance-btn" data-days="730" onclick="App.setTolerance(730)">±2 Años</button>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:8px; margin-top:8px; background:#ffffff; border:1px solid #cbd5e1; border-radius:6px; padding:4px 8px;">
+              <span style="font-size:12px; font-weight:600; color:#334155; white-space:nowrap;">Días personalizados (±):</span>
+              <input type="number" id="matcher-custom-days" min="1" max="3650" value="180" class="form-control" style="width:75px; padding:2px 6px; font-size:12px; height:26px; text-align:center; font-weight:700;" oninput="App.onCustomDaysInput(this.value)" />
+              <span style="font-size:11px; color:#64748b;">días</span>
+            </div>
+            
+            <div style="margin-top:10px;">
+              <label class="form-label" style="font-size:11px; margin-bottom:2px;">🎯 Criterio de selección:</label>
+              <select id="matcher-strategy-select" class="select-control" style="width:100%; font-size:12px;" onchange="App.runTimeMatcher()">
+                <option value="closest">🎯 Más cercano</option>
+                <option value="closest_prior">⬅️ Más cercano anterior</option>
+                <option value="closest_posterior">➡️ Más cercano posterior</option>
+                <option value="first_chrono">⏮️ Primero cronológicamente</option>
+                <option value="last_chrono">⏭️ Último cronológicamente</option>
+                <option value="farthest">📏 Más lejano</option>
+                <option value="strict_prior">🔒 Estrictamente anterior</option>
+                <option value="strict_posterior">🔒 Estrictamente posterior</option>
+              </select>
+            </div>
+
+            <div style="margin-top:8px;">
+              <label class="form-label" style="font-size:11px; margin-bottom:2px;">📍 Fecha de referencia:</label>
+              <select id="matcher-anchor-strategy-select" class="select-control" style="width:100%; font-size:12px;" onchange="App.runTimeMatcher()">
+                <option value="most_complete">🌟 Mayor coincidencia</option>
+                <option value="first">📅 Primera fecha</option>
+                <option value="last">📆 Última fecha</option>
+              </select>
+            </div>
+
+            <label style="display:flex; align-items:center; gap:6px; font-size:12px; margin-top:10px; cursor:pointer;">
+              <input type="checkbox" id="matcher-complete-only" onchange="App.runTimeMatcher()" />
+              <strong>Solo casos completos</strong>
+            </label>
+          </div>
+
+          <!-- Col 3: Instrumentos a fusionar -->
+          <div class="matcher-box">
+            <div class="matcher-box-title">📑 3. Instrumentos a Incluir</div>
+            <div id="matcher-instruments-checklist" class="instruments-checklist"></div>
+          </div>
+        </div>
+
+        <div class="matcher-stats-summary">
+          <div class="matcher-stat-pill" style="border-left:4px solid #10b981;">
+            <span id="matcher-stat-total">0 Pacientes</span>
+          </div>
+          <div style="margin-left:auto; display:flex; gap:8px;">
+            <button class="btn btn-success" onclick="Exporter.exportTimeMatchedTable('xlsx')">📥 Descargar Excel (.xlsx)</button>
+            <button class="btn btn-secondary" onclick="Exporter.exportTimeMatchedTable('csv')">Exportar CSV</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview Table -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">👁️ Tabla Fusionada</h2>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead id="matcher-table-head"></thead>
+            <tbody id="matcher-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. TAB: PATIENT VIEWER -->
+    <section id="tab-viewer" class="tab-pane">
+      <div class="card" style="margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h2 id="viewer-patient-title" class="card-title">Ficha del Paciente</h2>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-secondary" onclick="App.switchTab('tab-table')">◀ Volver a la Lista</button>
+            <button class="btn btn-primary" onclick="ReportPrinter.open(PatientViewer.currentPatientId)">🖨️ Ver Informe</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="patient-viewer-layout">
+        <aside class="viewer-sidebar">
+          <h3 style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;">Instrumentos</h3>
+          <ul id="viewer-form-list" class="viewer-form-list"></ul>
+        </aside>
+        <div class="viewer-main" id="viewer-fields-container"></div>
+      </div>
+    </section>
+
+    <!-- 6. TAB: EXPORT CENTER -->
+    <section id="tab-export" class="tab-pane">
+      <div class="card">
+        <h2 class="card-title" style="margin-bottom:6px;">📤 Centro de Exportación</h2>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:14px;">Elige el formato y modalidad de descarga:</p>
+
+        <!-- Selector Etiquetas de Texto vs Valores Numéricos -->
+        <div class="card" style="background:#f0fdf4; border-color:#86efac; padding:14px 18px; margin-bottom:20px;">
+          <div style="font-size:13px; font-weight:700; color:#065f46; margin-bottom:8px;">🔤 Modalidad de Datos:</div>
+          <div style="display:flex; gap:20px; flex-wrap:wrap;">
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer; font-weight:600; color:#1e293b;">
+              <input type="radio" name="export_mode" id="export-mode-labels" value="labels" checked style="accent-color:#0284c7; width:16px; height:16px;" />
+              <span>🏷️ Etiquetas de Texto (ej. "Mujer", "Normal", "DCL")</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer; font-weight:600; color:#1e293b;">
+              <input type="radio" name="export_mode" id="export-mode-raw" value="raw" style="accent-color:#0284c7; width:16px; height:16px;" />
+              <span>🔢 Valores Numéricos (ej. 1, 2, 0)</span>
+            </label>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
+          <div style="background:#f8fafc; border:1px solid var(--border); border-radius:var(--radius); padding:20px; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="font-size:24px; margin-bottom:8px;">📗</div>
+              <h3 style="font-size:16px; font-weight:700; color:#0369a1; margin-bottom:6px;">Libro Excel Multi-Hoja (.xlsx)</h3>
+              <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">Genera un libro Excel organizado en 16 pestañas temáticas.</p>
+            </div>
+            <button class="btn btn-lg btn-success" onclick="Exporter.exportExcelMultiSheet()">Descargar Excel Multi-Hoja</button>
+          </div>
+
+          <div style="background:#f8fafc; border:1px solid var(--border); border-radius:var(--radius); padding:20px; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="font-size:24px; margin-bottom:8px;">⏱️</div>
+              <h3 style="font-size:16px; font-weight:700; color:#0f766e; margin-bottom:6px;">Tabla de Fusión Temporal (.xlsx)</h3>
+              <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">Exporta las evaluaciones emparejadas en la ventana de tiempo seleccionada.</p>
+            </div>
+            <button class="btn btn-lg btn-primary" onclick="Exporter.exportTimeMatchedTable('xlsx')">Descargar Fusión Temporal</button>
+          </div>
+
+          <div style="background:#f8fafc; border:1px solid var(--border); border-radius:var(--radius); padding:20px; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="font-size:24px; margin-bottom:8px;">📄</div>
+              <h3 style="font-size:16px; font-weight:700; color:#7c3aed; margin-bottom:6px;">CSV REDCap (.csv)</h3>
+              <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">Exporta el archivo en el formato estándar de REDCap.</p>
+            </div>
+            <button class="btn btn-lg btn-secondary" onclick="Exporter.exportREDCapCSV()">Descargar CSV REDCap</button>
+          </div>
+
+          <div style="background:#f8fafc; border:1px solid var(--border); border-radius:var(--radius); padding:20px; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="font-size:24px; margin-bottom:8px;">💾</div>
+              <h3 style="font-size:16px; font-weight:700; color:#334155; margin-bottom:6px;">Backup JSON (.json)</h3>
+              <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">Copia de respaldo completa en formato JSON.</p>
+            </div>
+            <button class="btn btn-lg btn-secondary" onclick="Exporter.exportJSON()">Descargar Backup JSON</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: Conectar API REDCap -->
+  <div id="modal-api" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <h3 class="modal-title">🔗 Conectar API REDCap</h3>
+          <span id="api-saved-badge" class="badge badge-success" style="display:none; font-size:11px;">💾 Guardado</span>
+        </div>
+        <button class="btn-close" onclick="App.closeModal('modal-api')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group" style="margin-bottom:12px;">
+          <label class="form-label">Servidor / URL de la API:</label>
+          <input type="text" id="api-url-input" class="form-control" placeholder="https://redcap.sen.es/api/" />
+        </div>
+
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label">Token de API:</label>
+          <input type="password" id="api-token-input" class="form-control" placeholder="Pega aquí tu token..." />
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-top:3px;">
+            <span>Token de 32 caracteres obtenido en REDCap.</span>
+            <a href="javascript:void(0)" onclick="ApiClient.clearSavedCredentials()" style="color:#ef4444; text-decoration:none;">Borrar guardado</a>
+          </div>
+        </div>
+
+        <div id="api-status-box" style="display:none; margin-top:10px;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="App.closeModal('modal-api')">Cerrar</button>
+        <button class="btn btn-primary" onclick="ApiClient.fetchRecordsFromREDCap()">⬇️ Descargar Datos</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Cargar Archivo Local -->
+  <div id="modal-import" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">📥 Cargar Archivo Local</h3>
+        <button class="btn-close" onclick="App.closeModal('modal-import')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="dropzone" class="dropzone">
+          <div style="font-size:36px; margin-bottom:8px;">📁</div>
+          <p style="font-weight:700; color:var(--primary-dark);">Haz clic para seleccionar o arrastra aquí tu archivo</p>
+          <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">Archivos CSV (.csv) o Excel (.xlsx)</p>
+          <input type="file" id="file-input" accept=".csv,.xlsx,.xls,.json" style="display:none;" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="AppState.clearData(); App.closeModal('modal-import'); App.showToast('Datos limpiados', 'info'); DashboardManager.render(); TableView.render(); App.runTimeMatcher();">Limpiar Datos</button>
+        <button class="btn btn-secondary" onclick="App.closeModal('modal-import')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Informe Médico Imprimible -->
+  <div id="modal-report" class="modal-backdrop">
+    <div class="modal-box large">
+      <div class="modal-header">
+        <h3 class="modal-title">🖨️ Informe Clínico</h3>
+        <button class="btn-close" onclick="App.closeModal('modal-report')">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-report-body"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="App.closeModal('modal-report')">Cerrar</button>
+        <button class="btn btn-primary" onclick="ReportPrinter.print()">🖨️ Imprimir / PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Ayuda e Instrucciones -->
+  <div id="modal-help" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">❓ Guía de Uso</h3>
+        <button class="btn-close" onclick="App.closeModal('modal-help')">&times;</button>
+      </div>
+      <div class="modal-body" style="font-size:13px; line-height:1.6;">
+        <h4 style="color:#0369a1; margin-bottom:4px;">1. Conexión y Carga</h4>
+        <p style="margin-bottom:12px;">Descarga datos en vivo mediante <strong>🔗 Conectar API REDCap</strong> o abre archivos locales con <strong>📥 Cargar Archivo Local</strong>.</p>
+
+        <h4 style="color:#0369a1; margin-bottom:4px;">2. Búsqueda Libre</h4>
+        <p style="margin-bottom:12px;">En <strong>🔍 Búsqueda Libre</strong> localiza cualquier síntoma o valor en todas las variables y exporta los resultados a Excel.</p>
+
+        <h4 style="color:#0369a1; margin-bottom:4px;">3. Fusión Temporal</h4>
+        <p style="margin-bottom:12px;">En <strong>⏱️ Fusión Temporal</strong> unifica pruebas cercanas en el tiempo con criterios de selección configurables.</p>
+
+        <h4 style="color:#0369a1; margin-bottom:4px;">4. Exportación</h4>
+        <p>Descarga libros Excel en modo <strong>Etiquetas de Texto</strong> o <strong>Valores Numéricos</strong>.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="App.closeModal('modal-help')">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- OFFLINE VENDOR LIBRARIES -->
+  <script src="lib/papaparse.min.js"></script>
+  <script src="lib/xlsx.full.min.js"></script>
+  <script src="lib/chart.umd.min.js"></script>
+
+  <!-- METADATA DICTIONARY -->
+  <script src="data/dictionary_data.js"></script>
+  <script src="data/default_data.js"></script>
+
+  <!-- APP CORE MODULES -->
+  <script src="js/dictionary.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/api_client.js"></script>
+  <script src="js/deep_search.js"></script>
+  <script src="js/calculations.js"></script>
+  <script src="js/time_matcher.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/table_view.js"></script>
+  <script src="js/patient_viewer.js"></script>
+  <script src="js/exporter.js"></script>
+  <script src="js/report_printer.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
