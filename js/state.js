@@ -22,6 +22,9 @@ const AppState = {
   loadData(rows, source = 'file') {
     this.rawRows = rows || [];
     this.source = source;
+    if (typeof DictionaryManager !== 'undefined' && DictionaryManager.inferFromRawData) {
+      DictionaryManager.inferFromRawData(this.rawRows);
+    }
     this.rebuildIndex();
   },
 

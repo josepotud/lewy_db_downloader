@@ -1,5 +1,5 @@
 /**
- * Lewy Data Suite - Conector de API REDCap en Vivo con Almacenamiento Persistente
+ * Lewy Data Suite - Conector de API REDCap en Vivo con Autoconstrucción Dinámica
  */
 const ApiClient = {
   init() {
@@ -16,7 +16,6 @@ const ApiClient = {
       if (savedBadge) savedBadge.style.display = 'inline-flex';
     }
 
-    // Auto-save when user types
     if (urlInput) {
       urlInput.addEventListener('input', () => {
         localStorage.setItem('lewy_api_url', urlInput.value.trim());
@@ -54,7 +53,6 @@ const ApiClient = {
       return;
     }
 
-    // Guardar automáticamente
     localStorage.setItem('lewy_api_url', apiUrl);
     localStorage.setItem('lewy_api_token', apiToken);
     if (savedBadge) savedBadge.style.display = 'inline-flex';
@@ -66,30 +64,58 @@ const ApiClient = {
       statusBox.style.borderColor = '#86efac';
       statusBox.innerHTML = `
         <div>
-          <strong>Conectando con el servidor REDCap...</strong>
-          <p style="font-size:12px; color:#475569; margin:0;">Descargando registros de la cohorte en vivo</p>
+          <strong>Sincronizando con REDCap...</strong>
+          <p style="font-size:12px; color:#475569; margin:0;">Descargando estructura de metadatos y registros en vivo...</p>
         </div>
       `;
     }
 
-    const formData = new URLSearchParams();
-    formData.append('token', apiToken);
-    formData.append('content', 'record');
-    formData.append('format', 'json');
-    formData.append('type', 'flat');
-    formData.append('rawOrLabel', 'raw');
-    formData.append('rawOrLabelHeaders', 'raw');
-    formData.append('exportCheckboxLabel', 'false');
-    formData.append('returnFormat', 'json');
-
     try {
+      // 1. DESCARGA DINÁMICA DE METADATOS (Diccionario de Datos en Vivo)
+      try {
+        const metaFormData = new URLSearchParams();
+        metaFormData.append('token', apiToken);
+        metaFormData.append('content', 'metadata');
+        metaFormData.append('format', 'json');
+        metaFormData.append('returnFormat', 'json');
+
+        const metaResponse = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json'
+          },
+          body: metaFormData.toString()
+        });
+
+        if (metaResponse.ok) {
+          const metadata = await metaResponse.json();
+          if (Array.isArray(metadata) && metadata.length > 0) {
+            DictionaryManager.loadFromREDCapMetadata(metadata);
+          }
+        }
+      } catch (metaErr) {
+        console.warn('Metadatos en vivo no disponibles, utilizando diccionario base:', metaErr);
+      }
+
+      // 2. DESCARGA DE REGISTROS DE LA COHORTE
+      const recFormData = new URLSearchParams();
+      recFormData.append('token', apiToken);
+      recFormData.append('content', 'record');
+      recFormData.append('format', 'json');
+      recFormData.append('type', 'flat');
+      recFormData.append('rawOrLabel', 'raw');
+      recFormData.append('rawOrLabelHeaders', 'raw');
+      recFormData.append('exportCheckboxLabel', 'false');
+      recFormData.append('returnFormat', 'json');
+
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json'
         },
-        body: formData.toString()
+        body: recFormData.toString()
       });
 
       if (!response.ok) {
@@ -109,18 +135,18 @@ const ApiClient = {
         statusBox.style.borderColor = '#34d399';
         statusBox.innerHTML = `
           <div style="display:flex; align-items:center; gap:10px;">
-            
             <div>
-              <strong style="color:#065f46;">¡Conexión Exitosa con REDCap!</strong>
-              <p style="font-size:12px; color:#065f46; margin:0;">Sincronizados ${records.length} registros en vivo. Credenciales guardadas.</p>
+              <strong style="color:#065f46;">Conexión y Sincronización Exitosa</strong>
+              <p style="font-size:12px; color:#065f46; margin:0;">Estructura de ${DictionaryManager.dictionary.length} variables y ${records.length} registros sincronizados en vivo.</p>
             </div>
           </div>
         `;
       }
 
-      App.showToast(`Sincronizados ${records.length} registros desde REDCap`, 'success');
+      App.showToast(`Sincronizados ${records.length} registros y ${DictionaryManager.dictionary.length} variables`, 'success');
       DashboardManager.render();
       TableView.render();
+      App.renderTimeMatcherUI();
       App.runTimeMatcher();
 
       setTimeout(() => {
@@ -140,26 +166,27 @@ const ApiClient = {
               El navegador bloqueó la conexión directa por política CORS del servidor REDCap o token incorrecto.
             </p>
           </div>
-          <div style="background:#ffffff; border:1px solid #fecaca; border-radius:6px; padding:10px; margin-top:8px;">
-            <p style="font-size:12px; color:#1e293b; font-weight:600; margin-bottom:6px;">Solución inmediata:</p>
-            <p style="font-size:12px; color:#475569; margin-bottom:8px;">Carga el archivo CSV o Excel exportado desde REDCap:</p>
-            <button class="btn btn-sm btn-primary" onclick="App.closeModal('modal-api'); App.openModal('modal-import');">
-              Cargar Archivo CSV / Excel (.xlsx)
-            </button>
+          <div style="background:#ffffff; border:1px solid #fecaca; border-radius:6px; padding:8px 10px; font-size:11.5px; color:#991b1b;">
+            <strong>Solución recomendada:</strong> Exporta tu archivo CSV o Excel desde REDCap y cárgalo directamente en el botón <em>"Cargar Archivo Local"</em>.
           </div>
         `;
       }
 
-      App.showToast(`Aviso API: Carga mediante archivo CSV o Excel disponible`, 'warning');
+      App.showToast('Error al conectar con la API de REDCap', 'danger');
     }
   },
 
   clearSavedCredentials() {
+    localStorage.removeItem('lewy_api_url');
     localStorage.removeItem('lewy_api_token');
     const tokenInput = document.getElementById('api-token-input');
     const savedBadge = document.getElementById('api-saved-badge');
+    const statusBox = document.getElementById('api-status-box');
+
     if (tokenInput) tokenInput.value = '';
     if (savedBadge) savedBadge.style.display = 'none';
-    App.showToast('Credenciales borradas de este equipo', 'info');
+    if (statusBox) statusBox.style.display = 'none';
+
+    App.showToast('Credenciales guardadas eliminadas', 'info');
   }
 };
