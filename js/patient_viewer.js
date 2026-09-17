@@ -46,7 +46,7 @@ const PatientViewer = {
       }
 
       html += `<li class="viewer-form-item ${isActive ? 'active' : ''}" onclick="PatientViewer.switchForm('${form.id}')">
-        <span>${form.icon} ${form.title}</span>
+        <span>${form.title}</span>
         ${badgeHTML}
       </li>`;
     });
@@ -83,7 +83,7 @@ const PatientViewer = {
     // Header del Formulario y Selector de Evaluación
     html += `<div class="card-header">
       <div>
-        <h2 class="card-title">${formMeta ? formMeta.icon : ''} ${formMeta ? formMeta.title : this.activeFormId}</h2>
+        <h2 class="card-title">${formMeta ? formMeta.title : this.activeFormId}</h2>
         <p class="card-subtitle">Variables registradas (${variables.length} campos)</p>
       </div>`;
 
