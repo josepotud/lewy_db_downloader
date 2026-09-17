@@ -112,16 +112,9 @@
             <input type="text" id="global-search" placeholder="Buscar por ID Lewy, diagnóstico, notas clínicas o síntomas..." oninput="TableView.onSearchInput(this.value)" />
           </div>
           <div class="filter-group">
-            <label style="font-size:12px; font-weight:600;">Vista:</label>
-            <select class="select-control" onchange="TableView.setPreset(this.value)">
-              <option value="general">1. General</option>
-              <option value="clinica">2. Clínica y Debut</option>
-              <option value="neuropsicologia">3. Neuropsicología</option>
-              <option value="updrs_npi">4. MDS-UPDRS y NPI</option>
-              <option value="escalas">5. Escalas Funcionales</option>
-              <option value="lcr">6. Punción Lumbar (LCR)</option>
-              <option value="neuroimagen">7. Neuroimagen y SPECT</option>
-              <option value="eeg">8. Electroencefalograma</option>
+            <label style="font-size:12px; font-weight:600;">Instrumento / Vista:</label>
+            <select id="table-preset-select" class="select-control" style="font-size:12px; font-weight:600; min-width:260px;" onchange="TableView.setPreset(this.value)">
+              <option value="general">0. Resumen General de Cohorte</option>
             </select>
           </div>
         </div>
