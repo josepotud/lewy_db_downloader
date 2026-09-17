@@ -144,7 +144,7 @@ const TableView = {
         ${col.label} <span class="sort-indicator">${arrow}</span>
       </th>`;
     });
-    headerHTML += '<th style="text-align:right; min-width:140px; position:sticky; right:0; background:#f8fafc; z-index:2;">Acciones</th></tr>';
+    headerHTML += '</tr>';
     tableHeader.innerHTML = headerHTML;
 
     // Obtener y filtrar dataset
@@ -190,7 +190,7 @@ const TableView = {
     const pageRows = filteredRows.slice(startIdx, startIdx + this.pageSize);
 
     if (pageRows.length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="${columns.length + 1}" style="text-align:center; padding: 40px; color: var(--text-muted);">No se encontraron registros que coincidan con la búsqueda.</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="${columns.length}" style="text-align:center; padding: 40px; color: var(--text-muted);">No se encontraron registros que coincidan con la búsqueda.</td></tr>`;
     } else {
       let bodyHTML = '';
       pageRows.forEach(row => {
@@ -220,10 +220,6 @@ const TableView = {
           }
         });
 
-        bodyHTML += `<td style="text-align:right; position:sticky; right:0; background:#ffffff; box-shadow:-2px 0 5px rgba(0,0,0,0.03);">
-          <button class="btn btn-sm btn-outline-primary" onclick="PatientViewer.open('${id}')" title="Ver Ficha">Ficha</button>
-          <button class="btn btn-sm btn-secondary" onclick="ReportPrinter.open('${id}')" title="Informe PDF">Informe</button>
-        </td>`;
         bodyHTML += `</tr>`;
       });
       tableBody.innerHTML = bodyHTML;
